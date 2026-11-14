@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE_NAME, url } from '../site';
+---
+<Base title={`Page introuvable – ${SITE_NAME}`}>
+  <section class="container" style="max-width:820px">
+    <div class="eyebrow">Erreur 404</div>
+    <h1>Page introuvable</h1>
+    <p class="lead">Cette page n'existe pas ou a été déplacée.</p>
+    <a class="button" href={url('/veille/')}>Retour à la veille →</a>
+  </section>
+</Base>
