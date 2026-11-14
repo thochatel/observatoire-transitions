@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { SITE_NAME, url, dateFmt, themeLabel, briefCounts } from '../../site';
+export async function getStaticPaths() {
+  const briefs = await getCollection('briefs', ({ data }) => !data.draft);
+  return briefs.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const c = briefCounts(entry.body);
+---
+<Base title={`${entry.data.title} – ${SITE_NAME}`} description={entry.data.summary}>
+  <article class="article">
+    <a class="text-link" href={url('/briefs/')}>← Tous les briefs</a>
+    <div class="eyebrow" style="margin-top:32px">Brief du lundi · Semaine du {dateFmt(entry.data.date)}</div>
+    <h1>{entry.data.title}</h1>
+    {entry.data.themes.length > 0 && <div class="chips">{entry.data.themes.map((t) => <span class="chip">{themeLabel(t)}</span>)}</div>}
+    <div class="counters">
+      <div class="counter c-urgent"><strong>{c.urgent}</strong><span>Urgent</span></div>
+      <div class="counter c-suivre"><strong>{c.suivre}</strong><span>À suivre</span></div>
+      <div class="counter c-contexte"><strong>{c.contexte}</strong><span>Contexte</span></div>
+    </div>
+    {entry.data.summary && <p class="lead">{entry.data.summary}</p>}
+    <div class="article-content"><Content /></div>
+  </article>
+</Base>

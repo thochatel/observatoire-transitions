@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { SITE_NAME, url, dateFmt, briefCounts } from '../../site';
+const briefs = (await getCollection('briefs', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Base title={`Brief du lundi – ${SITE_NAME}`} description="Chaque lundi, la veille réglementaire et sectorielle de la semaine en trois niveaux de priorité.">
+  <section class="container">
+    <div class="eyebrow">Veille hebdomadaire</div>
+    <h1>Brief du lundi</h1>
+    <p class="lead">Chaque semaine, les évolutions réglementaires et sectorielles qui comptent pour la transition écologique, classées en trois niveaux : ce qui appelle une action, ce qu'il faut suivre, et le contexte de fond.</p>
+    {briefs.length === 0 && <p>Aucun brief publié pour l'instant.</p>}
+    <div class="grid" style="margin-top:36px">
+      {briefs.map((b) => {
+        const c = briefCounts(b.body);
+        return (
+          <article class="card">
+            <div class="meta">Semaine du {dateFmt(b.data.date)}</div>
+            <h3><a href={url(`/briefs/${b.id}/`)}>{b.data.title}</a></h3>
+            <div class="mini-counts">
+              <span><i class="dot c-urgent"></i><b>{c.urgent}</b> urgent</span>
+              <span><i class="dot c-suivre"></i><b>{c.suivre}</b> à suivre</span>
+              <span><i class="dot c-contexte"></i><b>{c.contexte}</b> contexte</span>
+            </div>
+            <p>{b.data.summary}</p>
+            <a class="text-link" style="margin-top:auto" href={url(`/briefs/${b.id}/`)}>Lire le brief →</a>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+</Base>

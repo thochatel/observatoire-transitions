@@ -1,10 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-import { SITE_NAME, url, dateFmt, themeLabel } from '../site';
+import { SITE_NAME, url, dateFmt, themeLabel, briefCounts } from '../site';
 const entries = (await getCollection('veille', ({ data }) => !data.draft))
   .sort((a,b) => b.data.date.valueOf() - a.data.date.valueOf());
 const featured = entries.find((entry) => entry.data.featured) ?? entries[0];
+const lastBrief = (await getCollection('briefs', ({ data }) => !data.draft))
+  .sort((a,b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+const bc = lastBrief ? briefCounts(lastBrief.body) : null;
 const latest = entries.filter((entry) => entry.id !== featured?.id).slice(0, 6);
 ---
 <Base title={SITE_NAME} description="Une veille éditoriale sur le climat, les territoires, la biodiversité et le numérique responsable.">
@@ -19,6 +22,19 @@ const latest = entries.filter((entry) => entry.id !== featured?.id).slice(0, 6);
         <h2 style="max-width:700px;margin:12px 0">{featured.data.title}</h2>
         <p>{featured.data.summary}</p>
         <a class="text-link" href={url(`/veille/${featured.id}/`)}>Lire la publication →</a>
+      </div>
+    )}
+    {lastBrief && bc && (
+      <div class="brief-band">
+        <div class="eyebrow">Dernier brief du lundi · Semaine du {dateFmt(lastBrief.data.date)}</div>
+        <h2 style="max-width:700px;margin:12px 0 10px;font-size:1.5rem">{lastBrief.data.title}</h2>
+        <div class="mini-counts">
+          <span><i class="dot c-urgent"></i><b>{bc.urgent}</b> urgent</span>
+          <span><i class="dot c-suivre"></i><b>{bc.suivre}</b> à suivre</span>
+          <span><i class="dot c-contexte"></i><b>{bc.contexte}</b> contexte</span>
+        </div>
+        <p>{lastBrief.data.summary}</p>
+        <a class="text-link" href={url(`/briefs/${lastBrief.id}/`)}>Lire le brief →</a>
       </div>
     )}
     <div class="section-head">

@@ -27,3 +27,18 @@ export const asset = (src?: string) =>
 
 export const dateFmt = (date: Date) =>
   new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+
+// Compte les éléments (### titres) dans chaque niveau d'un brief
+export function briefCounts(body = '') {
+  const counts = { urgent: 0, suivre: 0, contexte: 0 };
+  let tier: keyof typeof counts | null = null;
+  for (const line of body.split('\n')) {
+    if (/^##\s/.test(line)) {
+      const t = line.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      tier = t.includes('urgent') ? 'urgent' : t.includes('suivre') ? 'suivre' : t.includes('contexte') ? 'contexte' : null;
+    } else if (/^###\s/.test(line) && tier) {
+      counts[tier]++;
+    }
+  }
+  return counts;
+}

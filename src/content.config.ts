@@ -29,4 +29,17 @@ const veille = defineCollection({
   }),
 });
 
-export const collections = { veille };
+// Briefs du lundi : le contenu suit la structure ## Urgent / ## À suivre /
+// ## Contexte / ## Signal de la semaine, avec un ### par élément.
+const briefs = defineCollection({
+  loader: glob({ base: './src/content/briefs', pattern: '**/*.md' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    summary: str(),
+    themes: list(),
+    draft: bool(),
+  }),
+});
+
+export const collections = { veille, briefs };
