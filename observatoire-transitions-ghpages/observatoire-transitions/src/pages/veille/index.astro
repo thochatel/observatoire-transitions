@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { SITE_NAME, url, dateFmt, themeLabel } from '../../site';
+const entries = (await getCollection('veille', ({ data }) => !data.draft))
+  .sort((a,b) => b.data.date.valueOf() - a.data.date.valueOf());
+const themes = [...new Set(entries.flatMap((entry) => entry.data.themes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b), 'fr'));
+---
+<Base title={`La veille – ${SITE_NAME}`}>
+  <section class="container">
+    <div class="eyebrow">Bibliothèque de ressources</div>
+    <h1>La veille</h1>
+    <p class="lead">Actualités, publications, analyses et événements pour suivre les transformations écologiques.</p>
+    <label for="search" class="eyebrow" style="display:block;margin-top:32px">Rechercher une publication</label>
+    <input id="search" type="search" placeholder="Titre, résumé, thématique, mot-clé…" style="width:100%;max-width:600px;padding:13px 15px;border:1px solid #d8e0d7;border-radius:8px;background:white;font:inherit;margin:10px 0 18px" />
+    <div class="chips" id="filters" style="margin-bottom:28px">
+      <button class="chip filter active" data-theme="all" type="button">Tout</button>
+      {themes.map((theme) => <button class="chip filter" data-theme={theme} type="button">{themeLabel(theme)}</button>)}
+    </div>
+    <p id="count" class="meta">{entries.length} publication(s)</p>
+    <div class="grid" id="cards">
+      {entries.map((entry) => (
+        <article class="card publication" data-search={`${entry.data.title} ${entry.data.summary} ${entry.data.themes.map(themeLabel).join(' ')} ${entry.data.tags.join(' ')}`.toLowerCase()} data-themes={entry.data.themes.join('|')}>
+          <div class="meta">{entry.data.type} · {dateFmt(entry.data.date)}</div>
+          <h3><a href={url(`/veille/${entry.id}/`)}>{entry.data.title}</a></h3>
+          <p>{entry.data.summary}</p>
+          <div class="chips">{entry.data.themes.map((theme) => <span class="chip">{themeLabel(theme)}</span>)}</div>
+        </article>
+      ))}
+    </div>
+    <p id="empty" hidden>Aucune publication ne correspond à cette recherche.</p>
+  </section>
+  <script>
+    const search = document.querySelector('#search');
+    const cards = [...document.querySelectorAll('.publication')];
+    const filters = [...document.querySelectorAll('.filter')];
+    const count = document.querySelector('#count');
+    const empty = document.querySelector('#empty');
+    let activeTheme = 'all';
+    function update() {
+      const term = search.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach((card) => {
+        const matchesText = card.dataset.search.includes(term);
+        const matchesTheme = activeTheme === 'all' || card.dataset.themes.split('|').includes(activeTheme);
+        const show = matchesText && matchesTheme;
+        card.hidden = !show;
+        if (show) visible++;
+      });
+      count.textContent = `${visible} publication(s)`;
+      empty.hidden = visible !== 0;
+    }
+    search.addEventListener('input', update);
+    filters.forEach((button) => button.addEventListener('click', () => {
+      activeTheme = button.dataset.theme;
+      filters.forEach((item) => item.classList.toggle('active', item === button));
+      update();
+    }));
+  </script>
+  <style>
+    .filter{border:0;cursor:pointer;font:inherit}
+    .filter.active{background:#244b38;color:white}
+    .publication[hidden]{display:none}
+  </style>
+</Base>
