@@ -1,0 +1,84 @@
+media:
+  input: public/images
+  output: /images
+
+content:
+  - name: veille
+    label: Publications
+    type: collection
+    path: src/content/veille
+    format: yaml-frontmatter
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, date, type, themes, featured, draft]
+      primary: title
+      sort: [date, title]
+    fields:
+      - name: title
+        label: Titre
+        type: string
+        required: true
+      - name: date
+        label: Date de publication
+        type: date
+        required: true
+      - name: type
+        label: Type de publication
+        type: select
+        options:
+          values: [Actualité, Ressource, Analyse, Événement]
+      - name: themes
+        label: Thématiques
+        type: select
+        options:
+          multiple: true
+          values:
+            - name: climat
+              label: Climat
+            - name: adaptation
+              label: Adaptation
+            - name: biodiversite
+              label: Biodiversité
+            - name: territoires
+              label: Politiques territoriales
+            - name: mobilites
+              label: Mobilités
+            - name: alimentation
+              label: Alimentation
+            - name: numerique
+              label: Numérique responsable
+            - name: reglementation
+              label: Réglementation
+            - name: sobriete
+              label: Sobriété
+            - name: energie
+              label: Énergie
+      - name: tags
+        label: Mots-clés
+        type: string
+        list: true
+      - name: author
+        label: Auteur / organisme
+        type: string
+      - name: source
+        label: Nom de la source
+        type: string
+      - name: sourceUrl
+        label: URL de la source
+        type: string
+      - name: summary
+        label: Résumé
+        type: text
+        required: true
+      - name: featured
+        label: Mettre à la une
+        type: boolean
+      - name: draft
+        label: Brouillon
+        type: boolean
+      - name: cover
+        label: Image de couverture (facultatif)
+        type: image
+      - name: body
+        label: Contenu de l'article
+        type: rich-text
