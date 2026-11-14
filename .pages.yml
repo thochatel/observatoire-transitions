@@ -82,3 +82,58 @@ content:
       - name: body
         label: Contenu de l'article
         type: rich-text
+
+  - name: briefs
+    label: Brief du lundi
+    type: collection
+    path: src/content/briefs
+    format: yaml-frontmatter
+    filename: "{year}-{month}-{day}-brief-du-lundi.md"
+    view:
+      fields: [title, date, draft]
+      primary: title
+      sort: [date, title]
+    fields:
+      - name: title
+        label: Titre
+        type: string
+        required: true
+      - name: date
+        label: Date (lundi de la semaine)
+        type: date
+        required: true
+      - name: summary
+        label: Signal de la semaine (une phrase, affichée en accroche)
+        type: text
+      - name: themes
+        label: Thématiques
+        type: select
+        options:
+          multiple: true
+          values:
+            - name: climat
+              label: Climat
+            - name: adaptation
+              label: Adaptation
+            - name: biodiversite
+              label: Biodiversité
+            - name: territoires
+              label: Politiques territoriales
+            - name: mobilites
+              label: Mobilités
+            - name: alimentation
+              label: Alimentation
+            - name: numerique
+              label: Numérique responsable
+            - name: reglementation
+              label: Réglementation
+            - name: sobriete
+              label: Sobriété
+            - name: energie
+              label: Énergie
+      - name: draft
+        label: Brouillon
+        type: boolean
+      - name: body
+        label: "Contenu (titres : Urgent, À suivre, Contexte, Signal de la semaine)"
+        type: rich-text
